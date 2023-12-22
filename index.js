@@ -1,23 +1,22 @@
 "use strict";
 //intro UI
-const arrow = document.querySelector('.x')
-const blur = document.querySelector('.blur')
-const noticeBoard = document.querySelector('.notice_board')
-arrow.addEventListener('click',()=>{
-  blur.remove()
-  noticeBoard.remove()
-})
-blur.addEventListener(
-  'click',()=>{
-    blur.remove()
-  noticeBoard.remove()
-  }
-)
+const arrow = document.querySelector(".x");
+const blur = document.querySelector(".blur");
+const noticeBoard = document.querySelector(".notice_board");
+arrow.addEventListener("click", () => {
+  blur.remove();
+  noticeBoard.remove();
+});
+blur.addEventListener("click", () => {
+  blur.remove();
+  noticeBoard.remove();
+});
 
 // Data
 const account1 = {
-  owner: "Jonas Schmedtmann",
+  owner: "Jonas Schmedtmann ",
   movements: [200.5, 450, -400, 3000, -650.06, -130, 70, 1300],
+  emoji: '👱‍♂️',
   interestRate: 1.2, // %
   pin: 1111,
   movementsDates: [
@@ -37,6 +36,7 @@ const account1 = {
 const account2 = {
   owner: "Jessica Davis",
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
+  emoji :'👧',
   interestRate: 1.5,
   pin: 2222,
   movementsDates: [
@@ -55,6 +55,7 @@ const account2 = {
 
 const account3 = {
   owner: "Steven Thomas Williams",
+  emoji: '👦',
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
@@ -74,6 +75,7 @@ const account3 = {
 
 const account4 = {
   owner: "Sarah Smith",
+  emoji:'👩',
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
@@ -215,22 +217,49 @@ let min;
 let sec;
 let time;
 let y;
+let profile1 = document.querySelector(".account-1-name");
+let profile2 = document.querySelector(".account-2-name");
+let profile3 = document.querySelector(".account-3-name");
 
+let profile1Acct = document.querySelector(".account-1-acct");
+let profile2Acct = document.querySelector(".account-2-acct");
+let profile3Acct = document.querySelector(".account-3-acct");
+
+let filtered;
+
+let arr1 = [profile1, profile2, profile3];
+let arr2 = [profile1Acct, profile2Acct, profile3Acct];
+
+function updateOtherAcct(acct) {
+  profile1.innerHTML = acct[0]?.owner;
+  for(let [index,x] of Object.entries(acct) ){
+    console.log(x,index) 
+    arr1[index].innerHTML = x.owner +' '+ x.emoji
+    arr2[index].innerHTML ='Balance : ' + x.movements?.reduce((a,b)=> a+b).toFixed(2)
+  }
+}
 btnLogin.addEventListener("click", function (e) {
   e.preventDefault();
   currentAccount = accounts.find(
-    acc => acc.userName === (inputLoginUsername.value).toLowerCase()
+    acc => acc.userName === inputLoginUsername.value.toLowerCase()
   );
+  filtered = accounts.filter(
+    acc => acc.userName !== inputLoginUsername.value.toLowerCase()
+  );
+  updateOtherAcct(filtered);
+  console.log(filtered);
   if (currentAccount?.pin === Number(inputLoginPin.value)) {
-    printWelcome(currentAccount.owner.split(' ')[0])
-   
+    printWelcome(currentAccount.owner.split(" ")[0]);
+
     min = 5;
     sec = 60;
     time = 1000;
-    if(y){  window.clearInterval(y)} 
-     timeOut();
+    if (y) {
+      window.clearInterval(y);
+    }
+    timeOut();
     updateUI(currentAccount);
-containerApp.style.opacity = 100;
+    containerApp.style.opacity = 100;
   }
   inputLoginPin.value = inputLoginUsername.value = null;
   inputLoginPin.blur();
@@ -263,12 +292,16 @@ btnTransfer.addEventListener("click", function (e) {
     receiverAcc.movements.push(amount);
     receiverAcc.movementsDates.push(new Date().toISOString());
     updateUI(currentAccount);
+  updateOtherAcct(filtered);
+
     inputTransferTo.value = inputTransferAmount.value = null;
-    if(y){  window.clearInterval(y)} 
+    if (y) {
+      window.clearInterval(y);
+    }
     min = 5;
     sec = 60;
     time = 1000;
-     timeOut();
+    timeOut();
   }
 });
 
@@ -282,7 +315,6 @@ btnLoan.addEventListener("click", function (e) {
   e.preventDefault();
   const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(dep => dep > 0.1 * amount)) {
-
     setTimeout(function () {
       currentAccount.movements.push(amount);
 
@@ -292,11 +324,13 @@ btnLoan.addEventListener("click", function (e) {
       //update UI
       updateUI(currentAccount);
       inputLoanAmount.value = null;
-      if(y){  window.clearInterval(y)} 
+      if (y) {
+        window.clearInterval(y);
+      }
       min = 5;
       sec = 60;
       time = 1000;
-       timeOut();
+      timeOut();
     }, 2000);
   }
 });
@@ -316,7 +350,9 @@ btnClose.addEventListener("click", function (e) {
     //close UI
     inputCloseUsername.value = inputClosePin.value = null;
     containerApp.style.opacity = 0;
-    if(y){  window.clearInterval(y)} 
+    if (y) {
+      window.clearInterval(y);
+    }
     labelWelcome.innerText = `Log in to get started`;
   }
 });
@@ -327,7 +363,7 @@ function updateDate(acc) {
   acc.movementsDates.push(now);
 }
 let sorted = false;
-btnSort.addEventListener('click', function () {
+btnSort.addEventListener("click", function () {
   displayMovements(currentAccount, !sorted);
   sorted = !sorted;
 });
@@ -352,19 +388,17 @@ function timeOut() {
   }
 }
 
- function printWelcome (name) {
+function printWelcome(name) {
   const now = new Date();
   const greetings = new Map([
-    [[6, 7, 8, 9, 10], 'Good Morning'],
-    [[11, 12, 13, 14], 'Good Day'],
-    [[15, 16, 17, 18], 'Good Afternoon'],
-    [[19, 20, 21, 22], 'Good Evening'],
-    [[23, 0, 1, 2, 3, 4, 5], 'Good Night'],
+    [[6, 7, 8, 9, 10], "Good Morning"],
+    [[11, 12, 13, 14], "Good Day"],
+    [[15, 16, 17, 18], "Good Afternoon"],
+    [[19, 20, 21, 22], "Good Evening"],
+    [[23, 0, 1, 2, 3, 4, 5], "Good Night"],
   ]);
 
   const arr = [...greetings.keys()].find(key => key.includes(now.getHours()));
   const greet = greetings.get(arr);
   labelWelcome.innerText = `${greet}, ${name}!`;
-};
-
-
+}
